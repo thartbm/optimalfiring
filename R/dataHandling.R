@@ -29,6 +29,19 @@ extractMatData <- function() {
       targetGuess <- integrateTrials[,5]
       targetPos <- integrateTrials[,6]
       # just for completeness we add reaction time:
+      
+      modifier1 <- diff(abs(range(cue2pos - targetPos, na.rm=TRUE)) > .1)
+      modifier2 <- round((1.5 - ppdata$mirrorCnd) * 2)
+      
+      if (modifier1 == modifier2) {
+        cue1pos <- cue1pos * modifier1
+        cue2pos <- cue2pos * modifier1
+        targetGuess <- targetGuess * modifier1
+        targetPos <- targetPos * modifier1
+      } else {
+        cat('can not determine direction of exponential: unmodified data \n')
+      }
+      
       RT <- ppdata$reactionTime
       
       ppdf <- data.frame(expNo,
