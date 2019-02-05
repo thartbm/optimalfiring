@@ -61,3 +61,75 @@ plotIntegrationErrors <- function(exp=1, target='inline') {
   }
   
 }
+
+plotCueDistributions <- function(exp=1) {
+  
+  # these are exploratory plots only, so there should not be PDF or SVG output, only inline
+  
+  df <- read.csv(sprintf('data/exp%02d-integration.csv', exp), stringsAsFactors=FALSE)
+  
+  participants <- unique(df$participant)
+  
+  par(mfrow=c(1,2))
+  
+  cue1hist <- list()
+  cue2hist <- list()
+  
+  for (participant in participants) {
+    
+    ppdata <- df[which(df$participant == participant & !is.na(df$RT)),]
+    
+    # hist1 <- hist(ppdata$cue1pos - ppdata$targetPos,breaks=seq(-.38,.38,.01),plot=FALSE)
+    # print(hist1$counts)
+    # print(hist1$breaks)
+    cue1hist[[participant]] <- hist(ppdata$cue1pos - ppdata$targetPos,breaks=seq(-.38,.38,.01),plot=FALSE)
+    # print(diff(abs(range(ppdata$cue2pos - ppdata$targetPos)) > .1))
+    # print(range(ppdata$cue2pos - ppdata$targetPos))
+    cue2hist[[participant]] <- hist(ppdata$cue2pos - ppdata$targetPos,breaks=seq(-.38,.38,.01),plot=FALSE)
+    
+  }
+  
+  plot.new()
+  plot.window(xlim=c(-.38,.38),ylim=c(0,50))
+  title(main='Gaussian gun distributions')
+  
+  for (participant in participants) {
+    
+    # cat(sprintf('participant: %d\n',participant))
+    hist1 <- cue1hist[[participant]]
+    # print(hist1$breaks)
+    # print(hist1$counts)
+    
+    y <- hist1[['counts']]
+    x <- (hist1[['breaks']][1:(length(hist1[['breaks']])-1)] + (diff(hist1[['breaks']])/2.))
+    
+    lines(x,y,col='#66666666')
+    
+  }
+  
+  axis(side=1,at=c(-.3,-.2,-.1,0,.1,.2,.3))
+  axis(side=2,at=c(0,10,20,30,40,50))
+  
+  plot.new()
+  plot.window(xlim=c(-.38,.38),ylim=c(0,150))
+  title(main='Exponential gun distributions')
+  
+  for (participant in participants) {
+    
+    # cat(sprintf('participant: %d\n',participant))
+    hist2 <- cue2hist[[participant]]
+    # print(hist1$breaks)
+    # print(hist1$counts)
+    
+    y <- hist2[['counts']]
+    x <- (hist2[['breaks']][1:(length(hist2[['breaks']])-1)] + (diff(hist2[['breaks']])/2.))
+    
+    lines(x,y,col='#66666666')
+    
+  }
+  
+  axis(side=1,at=c(-.3,-.2,-.1,0,.1,.2,.3))
+  axis(side=2,at=c(0,30,60,90,120,150))
+  
+  
+}
